@@ -10,8 +10,8 @@ pipeline {
         stage('Preparar EC2') {
             steps {
                 sshagent(['auth-key']) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} << EOF
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@${params.EC2_HOST} << EOF
                         
                         # Verificar instalación de Docker y Docker Compose
                         if ! command -v docker &> /dev/null || ! command -v docker-compose &> /dev/null; then
@@ -28,7 +28,7 @@ pipeline {
                             fi
 
                             if ! command -v docker-compose &> /dev/null; then
-                                sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                                sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-\\$(uname -s)-\\$(uname -m)" -o /usr/local/bin/docker-compose
                                 sudo chmod +x /usr/local/bin/docker-compose
                             fi
                         fi
@@ -36,7 +36,7 @@ pipeline {
                         mkdir -p /home/ubuntu/auth-service
 
                         EOF
-                    '''
+                    """
                 }
             }
         }
@@ -44,12 +44,12 @@ pipeline {
         stage('Despliegue') {
             steps {
                 sshagent(['auth-key']) {
-                    sh '''
+                    sh """
                         # Copiar archivos al EC2
-                        scp -r -o StrictHostKeyChecking=no ./* ubuntu@${EC2_HOST}:/home/ubuntu/auth-service/
+                        scp -r -o StrictHostKeyChecking=no ./* ubuntu@${params.EC2_HOST}:/home/ubuntu/auth-service/
 
                         # Ejecutar comandos en EC2
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} << EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@${params.EC2_HOST} << EOF
                             cd /home/ubuntu/auth-service
 
                             # Eliminar contenedor anterior si existe
@@ -58,7 +58,7 @@ pipeline {
                             sudo docker rmi auth-service || true
 
                             # Construir imagen con nombre de aplicación
-                            sudo docker build --build-arg APP_NAME='${APP_NAME}' -t auth-service .
+                            sudo docker build --build-arg APP_NAME="${params.APP_NAME}" -t auth-service .
 
                             # Ejecutar contenedor en el puerto 80
                             sudo docker run -d --name auth-service -p 80:80 auth-service
@@ -66,7 +66,7 @@ pipeline {
                             # Mostrar contenedor en ejecución
                             sudo docker ps | grep auth-service
                         EOF
-                    '''
+                    """
                 }
             }
         }
