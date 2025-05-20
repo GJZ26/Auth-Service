@@ -7,7 +7,7 @@ ARG JWT_SECRET="secret"
 
 # Establecer ENV a partir del ARG
 ENV APP_NAME=${APP_NAME}
-ENV JWT_SECRET=${APP_NAME}
+ENV JWT_SECRET=${JWT_SECRET}
 
 # Crear directorio de la aplicación
 WORKDIR /usr/src/app

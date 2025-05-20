@@ -9,8 +9,8 @@ app.use(express.json());
 
 app.get('/', (req, res) => {
     res.send(`
-        App Name: ${process.env.APP_NAME}
-        JWT Secret: ${process.env.JWT_SECRET}
+        <p>App Name: <b>${process.env.APP_NAME}</b></p>
+        <p>JWT Secret: <b>${process.env.JWT_SECRET}</b></p>
         `);
 });
 
