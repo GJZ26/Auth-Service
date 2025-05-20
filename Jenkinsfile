@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    parameters {
-        string(name: 'APP_NAME', description: 'Nombre de la aplicación')
-        string(name: 'EC2_HOST', description: 'Host o IP pública de la instancia EC2')
-    }
-
     environment {
         REMOTE_PATH = "/home/ubuntu/auth-service"
         GIT_REPO    = "https://github.com/GJZ26/Auth-Service.git"
