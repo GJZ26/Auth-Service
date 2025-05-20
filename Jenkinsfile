@@ -1,11 +1,13 @@
 pipeline {
     agent any
 
+    /* Parámetros de entrada */
     parameters {
-        string(name: 'APP_NAME', defaultValue: 'Auth Service', description: 'Nombre de la aplicación')
-        string(name: 'EC2_HOST', defaultValue: '0.0.0.0', description: 'IP pública real de la instancia EC2')
+        string(name: 'APP_NAME', description: 'Nombre de la aplicación')
+        string(name: 'EC2_HOST', description: 'Host o IP pública de la instancia EC2')
     }
 
+    /* Variables de entorno comunes */
     environment {
         REMOTE_PATH = "/home/ubuntu/auth-service"
         GIT_REPO    = "https://github.com/GJZ26/Auth-Service.git"
@@ -18,13 +20,12 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'keyAgentDev',
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
-                    sshagent(credentials: ['keyAgentDev']) {
-                        sh """
-                        ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${EC2_USER}@${params.EC2_HOST} << EOF
+                    sh """
+                        chmod 600 "$SSH_KEY_FILE"
+                        ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOST}" << 'EOF'
                             set -e
-                            export DEBIAN_FRONTEND=noninteractive
 
-                            # Instalar Docker si no existe
+                             # Instalar Docker si no existe
                             if ! command -v docker >/dev/null; then
                                 sudo apt-get update -y
                                 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
@@ -52,8 +53,7 @@ pipeline {
                                 git reset --hard origin/${GIT_BRANCH}
                             fi
                         EOF
-                        """
-                    }
+                    """
                 }
             }
         }
@@ -63,9 +63,9 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'keyAgentDev',
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
-                    sshagent(credentials: ['keyAgentDev']) {
-                        sh """
-                        ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${EC2_USER}@${params.EC2_HOST} << EOF
+                    sh """
+                        chmod 600 "$SSH_KEY_FILE"
+                        ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOST}" << 'EOF'
                             set -e
                             cd ${REMOTE_PATH}
 
@@ -83,8 +83,7 @@ pipeline {
 
                             sudo docker ps --filter "name=auth-service"
                         EOF
-                        """
-                    }
+                    """
                 }
             }
         }
