@@ -17,12 +17,11 @@ pipeline {
     stages {
         stage('Preparar EC2') {
             steps {
-                /* Carga la clave SSH (tipo “SSH Username with private key”) */
                 withCredentials([sshUserPrivateKey(credentialsId: 'keyAgentDev',
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
-                    sshagent(credentials: ['keyAgentDev']) {
-                        sh """
+                    sh """
+                        chmod 600 ${SSH_KEY_FILE}
                         ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${EC2_USER}@${params.EC2_HOST} << 'EOF'
                             set -e
 
@@ -44,7 +43,7 @@ pipeline {
 
                             # 2) Instalar Docker Compose
                             if ! command -v docker-compose >/dev/null; then
-                                sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-\$(uname -s)-\$(uname -m)" \
+                                sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-\\\$(uname -s)-\\\$(uname -m)" \
                                      -o /usr/local/bin/docker-compose
                                 sudo chmod +x /usr/local/bin/docker-compose
                             fi
@@ -58,8 +57,7 @@ pipeline {
                                 git reset --hard origin/${GIT_BRANCH}
                             fi
                         EOF
-                        """
-                    }
+                    """
                 }
             }
         }
@@ -69,8 +67,8 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'keyAgentDev',
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
-                    sshagent(credentials: ['keyAgentDev']) {
-                        sh """
+                    sh """
+                        chmod 600 ${SSH_KEY_FILE}
                         ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${EC2_USER}@${params.EC2_HOST} << 'EOF'
                             set -e
                             cd ${REMOTE_PATH}
@@ -94,8 +92,7 @@ pipeline {
                             # 4) Comprobar estado
                             sudo docker ps --filter "name=auth-service"
                         EOF
-                        """
-                    }
+                    """
                 }
             }
         }
