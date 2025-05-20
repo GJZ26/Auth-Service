@@ -12,6 +12,10 @@ ARG DB_HOST="host"
 # Establecer ENV a partir del ARG
 ENV APP_NAME=${APP_NAME}
 ENV JWT_SECRET=${JWT_SECRET}
+ENV DB_NAME=${DB_NAME}
+ENV DB_USER=${DB_USER}
+ENV DB_PASSWORD=${DB_PASSWORD}
+ENV DB_HOST=${DB_HOST}
 
 # Crear directorio de la aplicación
 WORKDIR /usr/src/app
