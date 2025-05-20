@@ -19,8 +19,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['auth-key']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${params.EC2_HOST} << EOF
-                        # Instalar Docker y Docker Compose si es necesario
+                    ssh -o StrictHostKeyChecking=no ${EC2_USER}@${params.EC2_HOST} '
                         if ! command -v docker &> /dev/null; then
                             sudo apt update -y
                             sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
@@ -33,11 +32,10 @@ pipeline {
                         fi
 
                         if ! command -v docker-compose &> /dev/null; then
-                            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-\\$(uname -s)-\\$(uname -m)" -o /usr/local/bin/docker-compose
+                            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
                             sudo chmod +x /usr/local/bin/docker-compose
                         fi
 
-                        # Clonar o actualizar el repositorio
                         if [ ! -d "${REMOTE_PATH}" ]; then
                             git clone -b ${GIT_BRANCH} ${GIT_REPO} ${REMOTE_PATH}
                         else
@@ -45,7 +43,7 @@ pipeline {
                             git fetch origin
                             git reset --hard origin/${GIT_BRANCH}
                         fi
-                        EOF
+                    '
                     """
                 }
             }
