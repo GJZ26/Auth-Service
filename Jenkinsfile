@@ -21,8 +21,8 @@ pipeline {
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
                     sh """
-                        chmod 600 ${SSH_KEY_FILE}
-                        ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${EC2_USER}@${params.EC2_HOST} << 'EOF'
+                        chmod 600 "$SSH_KEY_FILE"
+                        ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOST}" << 'EOF'
                             set -e
 
                             # 1) Instalar Docker
@@ -68,8 +68,8 @@ pipeline {
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
                     sh """
-                        chmod 600 ${SSH_KEY_FILE}
-                        ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${EC2_USER}@${params.EC2_HOST} << 'EOF'
+                        chmod 600 "$SSH_KEY_FILE"
+                        ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOST}" << 'EOF'
                             set -e
                             cd ${REMOTE_PATH}
 
