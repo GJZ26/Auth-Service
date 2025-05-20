@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Preparar EC2') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: '${params.CREDENTIAL_ID}',
+                withCredentials([sshUserPrivateKey(credentialsId: params.CREDENTIAL_ID,
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
                     sh """
@@ -53,7 +53,7 @@ EOF
 
         stage('Construir y Desplegar') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: '${params.CREDENTIAL_ID}',
+                withCredentials([sshUserPrivateKey(credentialsId: params.CREDENTIAL_ID,
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
                     sh """
