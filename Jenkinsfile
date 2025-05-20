@@ -18,10 +18,10 @@ pipeline {
         stage('Preparar EC2') {
             steps {
                 /* Carga la clave SSH (tipo “SSH Username with private key”) */
-                withCredentials([sshUserPrivateKey(credentialsId: 'auth-key',
+                withCredentials([sshUserPrivateKey(credentialsId: 'keyAgentDev',
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
-                    sshagent(credentials: ['auth-key']) {
+                    sshagent(credentials: ['keyAgentDev']) {
                         sh """
                         ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${EC2_USER}@${params.EC2_HOST} << 'EOF'
                             set -e
@@ -66,10 +66,10 @@ pipeline {
 
         stage('Construir y Desplegar') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'auth-key',
+                withCredentials([sshUserPrivateKey(credentialsId: 'keyAgentDev',
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
-                    sshagent(credentials: ['auth-key']) {
+                    sshagent(credentials: ['keyAgentDev']) {
                         sh """
                         ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${EC2_USER}@${params.EC2_HOST} << 'EOF'
                             set -e
