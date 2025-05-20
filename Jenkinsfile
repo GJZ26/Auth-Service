@@ -3,6 +3,7 @@ pipeline {
 
     parameters {
         string(name: 'APP_NAME', defaultValue: 'Auth Service', description: 'Nombre de la aplicación')
+        string(name: 'EC2_HOST', defaultValue: 'ec2-xx-xx-xx-xx.compute-1.amazonaws.com', description: 'Host o IP pública de la instancia EC2')
     }
 
     stages {
@@ -10,7 +11,7 @@ pipeline {
             steps {
                 sshagent(['auth-key']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@ec2-instance << EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} << EOF
                         
                         # Verificar instalación de Docker y Docker Compose
                         if ! command -v docker &> /dev/null || ! command -v docker-compose &> /dev/null; then
@@ -45,10 +46,10 @@ pipeline {
                 sshagent(['auth-key']) {
                     sh '''
                         # Copiar archivos al EC2
-                        scp -r -o StrictHostKeyChecking=no ./* ubuntu@ec2-instance:/home/ubuntu/auth-service/
+                        scp -r -o StrictHostKeyChecking=no ./* ubuntu@${EC2_HOST}:/home/ubuntu/auth-service/
 
                         # Ejecutar comandos en EC2
-                        ssh -o StrictHostKeyChecking=no ubuntu@ec2-instance << EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} << EOF
                             cd /home/ubuntu/auth-service
 
                             # Eliminar contenedor anterior si existe
