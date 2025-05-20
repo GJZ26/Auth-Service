@@ -1,6 +1,10 @@
 pipeline {
     agent any
     
+    parameters {
+        string(name: 'APP_NAME', defaultValue: 'Auth Service', description: 'Nombre de la aplicación')
+    }
+    
     stages {
         stage('Conexión a EC2') {
             steps {
@@ -49,7 +53,9 @@ pipeline {
         stage('Despliegue') {
             steps {
                 sshagent(['auth-key']) {
-                    sh '''
+                    sh """
+                        # Definir la variable appName
+                        APP_NAME="${params.APP_NAME}"
                         # Copiar archivos al servidor
                         scp -r -o StrictHostKeyChecking=no ./* ubuntu@ec2-instance:/home/ubuntu/auth-service/
                         
@@ -58,7 +64,7 @@ pipeline {
                             cd /home/ubuntu/auth-service
                             
                             # Construir la imagen con el parámetro APP_NAME
-                            sudo docker build --build-arg APP_NAME="AppName" -t auth-service .
+                            sudo docker build --build-arg APP_NAME="${APP_NAME}" -t auth-service .
                             
                             # Detener el contenedor si ya está en ejecución
                             sudo docker stop auth-service || true
@@ -70,7 +76,7 @@ pipeline {
                             # Verificar que el contenedor esté en ejecución
                             sudo docker ps | grep auth-service
                         EOF
-                    '''
+                    """
                 }
             }
         }
