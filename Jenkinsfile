@@ -64,7 +64,7 @@ ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOS
     cd ${REMOTE_PATH}
 
     # Reconstruir imagen
-    sudo docker build --build-arg APP_NAME="${params.APP_NAME}" --build-arg JWT_SECRET="${params.JWT_SECRET}" -t auth-service .
+    sudo docker build --build-arg APP_NAME="${params.APP_NAME}" --build-arg JWT_SECRET="${params.JWT_SECRET}" --build-arg DB_NAME="${params.DB_NAME}" --build-arg DB_USER="${params.DB_USER}" --build-arg DB_PASSWORD="${params.DB_PASSWORD}" --build-arg DB_HOST="${params.DB_HOST}" -t auth-service .
 
     # Parar y eliminar contenedor si existe
     if sudo docker ps -a --format '{{.Names}}' | grep -q '^auth-service\$'; then
