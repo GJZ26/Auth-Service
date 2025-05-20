@@ -3,14 +3,12 @@ pipeline {
 
     environment {
         REMOTE_PATH = "/home/ubuntu/auth-service"
-        GIT_REPO    = "https://github.com/GJZ26/Auth-Service.git"
-        GIT_BRANCH  = "dev"
     }
 
     stages {
         stage('Preparar EC2') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'keyAgentDev',
+                withCredentials([sshUserPrivateKey(credentialsId: '${params.CREDENTIAL_ID}',
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
                     sh """
@@ -41,11 +39,11 @@ ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOS
 
     # Clonar o actualizar repositorio
     if [ ! -d "${REMOTE_PATH}" ]; then
-        git clone -b ${GIT_BRANCH} ${GIT_REPO} ${REMOTE_PATH}
+        git clone -b ${params.GIT_BRANCH} ${params.GIT_REPO} ${REMOTE_PATH}
     else
         cd ${REMOTE_PATH}
         git fetch --all
-        git reset --hard origin/${GIT_BRANCH}
+        git reset --hard origin/${params.GIT_BRANCH}
     fi
 EOF
                     """
@@ -55,7 +53,7 @@ EOF
 
         stage('Construir y Desplegar') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'keyAgentDev',
+                withCredentials([sshUserPrivateKey(credentialsId: '${params.CREDENTIAL_ID}',
                                                   keyFileVariable: 'SSH_KEY_FILE',
                                                   usernameVariable: 'EC2_USER')]) {
                     sh """
@@ -66,7 +64,7 @@ ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOS
     cd ${REMOTE_PATH}
 
     # Reconstruir imagen
-    sudo docker build --build-arg APP_NAME="${params.APP_NAME}" -t auth-service .
+    sudo docker build --build-arg APP_NAME="${params.APP_NAME}" --build-arg JWT_SECRET="${params.JWT_SECRET}" -t auth-service .
 
     # Parar y eliminar contenedor si existe
     if sudo docker ps -a --format '{{.Names}}' | grep -q '^auth-service\$'; then

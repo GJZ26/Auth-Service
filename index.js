@@ -8,7 +8,10 @@ const app = express();
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.send(`App Name: ${process.env.APP_NAME}`);
+    res.send(`
+        App Name: ${process.env.APP_NAME}
+        JWT Secret: ${process.env.JWT_SECRET}
+        `);
 });
 
 app.listen(80, () => {

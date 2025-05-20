@@ -3,9 +3,11 @@ FROM node:18-alpine
 
 # Definir ARG para APP_NAME que se puede pasar durante la construcción
 ARG APP_NAME="Auth Service"
+ARG JWT_SECRET="secret"
 
 # Establecer ENV a partir del ARG
 ENV APP_NAME=${APP_NAME}
+ENV JWT_SECRET=${APP_NAME}
 
 # Crear directorio de la aplicación
 WORKDIR /usr/src/app
