@@ -4,6 +4,10 @@ FROM node:18-alpine
 # Definir ARG para APP_NAME que se puede pasar durante la construcción
 ARG APP_NAME="Auth Service"
 ARG JWT_SECRET="secret"
+ARG DB_NAME="databse"
+ARG DB_USER="username"
+ARG DB_PASSWORD="password"
+ARG DB_HOST="host"
 
 # Establecer ENV a partir del ARG
 ENV APP_NAME=${APP_NAME}
