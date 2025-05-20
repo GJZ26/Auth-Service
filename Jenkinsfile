@@ -1,13 +1,11 @@
 pipeline {
     agent any
 
-    /* Parámetros de entrada */
     parameters {
         string(name: 'APP_NAME', description: 'Nombre de la aplicación')
         string(name: 'EC2_HOST', description: 'Host o IP pública de la instancia EC2')
     }
 
-    /* Variables de entorno comunes */
     environment {
         REMOTE_PATH = "/home/ubuntu/auth-service"
         GIT_REPO    = "https://github.com/GJZ26/Auth-Service.git"
@@ -22,10 +20,12 @@ pipeline {
                                                   usernameVariable: 'EC2_USER')]) {
                     sh """
                         chmod 600 "$SSH_KEY_FILE"
-                        ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOST}" << 'EOF'
+                        ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R "${params.EC2_HOST}" || true
+                        ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOST}" << EOF
                             set -e
+                            export DEBIAN_FRONTEND=noninteractive
 
-                             # Instalar Docker si no existe
+                            # Instalar Docker si no existe
                             if ! command -v docker >/dev/null; then
                                 sudo apt-get update -y
                                 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
@@ -65,7 +65,8 @@ pipeline {
                                                   usernameVariable: 'EC2_USER')]) {
                     sh """
                         chmod 600 "$SSH_KEY_FILE"
-                        ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOST}" << 'EOF'
+                        ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R "${params.EC2_HOST}" || true
+                        ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER"@"${params.EC2_HOST}" << EOF
                             set -e
                             cd ${REMOTE_PATH}
 
